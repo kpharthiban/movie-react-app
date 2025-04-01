@@ -4,6 +4,7 @@ import './App.css';
 import Search from './components/search';
 import Spinner from './components/Spinner';
 import MovieCard from './components/MovieCard';
+import { updateSearchCount } from './appwrite';
 
 // API - Application Programming Interface - a set of rules that allows one software application to talk to another
 const API_BASE_URL = 'https://api.themoviedb.org/3'
@@ -32,7 +33,7 @@ const App = () => {
     setErrorMessage('');
 
     try {
-      const endpoint = query 
+      const endpoint = query
       ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
       : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
@@ -51,6 +52,11 @@ const App = () => {
       }
 
       setMovieList(data.results || []);
+
+      if (query && data.results.length > 0) {
+        await updateSearchCount(query, data.results[0]);
+      }
+
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);
       setErrorMessage('Error fetching movies. Please try again later.');
